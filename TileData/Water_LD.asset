@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0070decadf4d0c429fb4319a00db29d, type: 3}
+  m_Name: Water_LD
+  m_EditorClassIdentifier: 
+  tile: {fileID: 11400000, guid: 13541c93e39240b4c90fca224ccfe966, type: 2}
+  edgeU: 01000000
+  edgeD: 0000000001000000
+  edgeL: 0100000000000000
+  edgeR: 01000000
+  accU: []
+  accD:
+  - {fileID: 11400000, guid: 4fda312ee896750458095eab1336cbec, type: 2}
+  - {fileID: 11400000, guid: c39333e517f74e74985bcc8b6ecb6bd3, type: 2}
+  accL:
+  - {fileID: 11400000, guid: b1bb63b851f6b184f9f33ea3b3d90549, type: 2}
+  - {fileID: 11400000, guid: 39f081f522efb074cb4fd91fe5bcd381, type: 2}
+  accR: []
