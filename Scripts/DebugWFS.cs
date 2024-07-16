@@ -6,41 +6,16 @@ using UnityEngine;
 //[ExecuteAlways]
 public class DebugWFS : MonoBehaviour
 {
-    const int width = 10;
-    const int height = 10;
+    const int width = 20;
+    const int height = 15;
 
     [SerializeField] GameObject debugPrefab;
     [SerializeField] Transform debugParent;
     GameObject[,] debugGrid = new GameObject[width, height];
 
     public void initDebug() {
-        //clearing previous instances
-
-
-        // Store references to all children first
-        int childCount = debugParent.childCount;
-        Transform[] children = new Transform[childCount];
-        for (int i = 0; i < childCount; i++) {
-            children[i] = debugParent.GetChild(i);
-        }
-
-        // Detach children from parent to avoid modifying the collection during iteration
-        debugParent.DetachChildren();
-
-        // Destroy all children
-        for (int i = 0; i < childCount; i++) {
-            DestroyImmediate(children[i].gameObject);
-        }
-
-        //while(debugParent.childCount != 0) {
-        //    DestroyImmediate(debugParent.GetChild(0));
-        //}
-
-
-        //foreach (Transform child in debugParent) {
-        //    debugParent.
-        //    DestroyImmediate(child.gameObject);
-        //}
+        //to prevent undefined behaviour
+        clearPreviousInstance();
 
         //generating new instances
         Vector3 textCoord;
@@ -55,6 +30,25 @@ public class DebugWFS : MonoBehaviour
         }
     }
 
+    private void clearPreviousInstance() {
+        // Store references to all children first
+        int childCount = debugParent.childCount;
+        Transform[] children = new Transform[childCount];
+        for (int i = 0; i < childCount; i++) {
+            children[i] = debugParent.GetChild(i);
+        }
+
+        // Detach children from parent to avoid modifying the collection during iteration
+        debugParent.DetachChildren();
+
+        // Destroy all children
+        for (int i = 0; i < childCount; i++) {
+            DestroyImmediate(children[i].gameObject);
+        }
+    }
+
+    //TODO
+    //This can be optimised by only chaning the updated blocks
     public void updateDebugDisplay(Node[,] grid) {
         TextMeshPro entropyText;
         for(int x = 0; x < width;x++) {
@@ -65,11 +59,13 @@ public class DebugWFS : MonoBehaviour
             }
         }
     }
+
     //TODO
     //Toggling item off, breaks references and stops them from being updated.
     //GetComponent<Renderer>().enabled = false
     //GetComponent<CanvasRenderer>().cull = false
     //Meshrender?
+    //NVM it seems to work fine as is
     public void toggleDebug() {
         foreach (Transform child in debugParent) {
             child.gameObject.SetActive(!child.gameObject.activeSelf);

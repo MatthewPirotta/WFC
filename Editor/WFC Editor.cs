@@ -19,10 +19,6 @@ public class WFCEditor : Editor {
             wfs.WFC();
         }
 
-       // if (GUILayout.Button("Toggle Collapse all")) {
-       //     wfs.collapseAll = !wfs.collapseAll;
-       // }
-
         if (GUILayout.Button("Toggle Debug")) {
             wfs.toggleDebugDisplay();
         }

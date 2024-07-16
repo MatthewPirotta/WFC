@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
+using UnityEditor;
+using UnityEngine.Assertions;
 
 [CreateAssetMenu(fileName = "WFCTile", menuName = "ScriptableObjects/TileData")]
 [SerializeField]
 public class TileData : ScriptableObject
 {
     public Tile tile;
-   
+    public const string directions = "UDLR"; //Used in for loops to traverse all possible direction
+
+
     //Order Matters
     //First edge type is what is on 'top'/'right'
     //Second edge type is what is on 'bottom'/'left'
@@ -32,7 +36,7 @@ public class TileData : ScriptableObject
             case 'D': return edgeD;
             case 'L': return edgeL;
             case 'R': return edgeR;
-            default: return null; //should not reach this but ifykyk
+            default: Debug.LogError("OH no"); return null;
         }
     }
 
@@ -45,14 +49,57 @@ public class TileData : ScriptableObject
         }
     }
 
+    public List<TileData> getAccDir(char dir) {
+        switch (dir) {
+            case 'U': return accU;
+            case 'D': return accD;
+            case 'L': return accL;
+            case 'R': return accR;
+            default: Debug.LogError("OH no"); return null;
+        }
+    }
+
     public static char getOppDir(char dir) {
         switch (dir) {
             case 'U': return 'D';
             case 'D': return 'U';
             case 'L': return 'R';
             case 'R': return 'L';
-            default: return '-'; //should not reach this but ifykyk
+            default: Debug.LogError("OH no"); return '-';
         }
+    }
+
+    public static Vector2Int getOffset(char dir) {
+        switch (dir) {
+            case 'U': return Vector2Int.up;
+            case 'D': return Vector2Int.down;
+            case 'L': return Vector2Int.left;
+            case 'R': return Vector2Int.right; 
+        }
+        Debug.LogError("OH no");
+        return Vector2Int.zero;
+    }
+
+    public static List<TileData> LoadAllTileData() {
+        // Path to the folder containing your ScriptableObjects
+        string path = "Assets/TileData";
+
+        // Load all assets of type TileData from the specified folder
+        string[] assetGuids = AssetDatabase.FindAssets("t:TileData", new[] { path });
+        List<TileData> tileCompendium = new List<TileData>();
+
+        foreach (string guid in assetGuids) {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            TileData tileData = AssetDatabase.LoadAssetAtPath<TileData>(assetPath);
+            if (tileData != null) {
+                tileCompendium.Add(tileData);
+            }
+        }
+
+        // Output the list or do something with it
+        //Debug.Log($"Loaded {tileCompendium.Count} TileData assets from {path}");
+
+        return tileCompendium;
     }
 }
 
