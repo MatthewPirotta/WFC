@@ -7,23 +7,24 @@ using System.Linq;
 public static class TileConnectionsParser {
 
     const int directionsIndex = 1;
+    const string directions = "UDLR";
+    
 
     [MenuItem("Tools/Load TileData")]
     public static void setConnecetions() {
         List<TileData> tileCompendium = LoadTileData();
-        Dictionary<char, List<TileData>> tileDirDict = convertTileCompToDict(tileCompendium);
-
+        //Dictionary<char, List<TileData>> tileDirDict = convertTileCompToDict(tileCompendium);
 
         foreach (TileData tileData in tileCompendium) {
-            string directions = getTileDirections(tileData);
+            //string directions = getTileDirections(tileData); TODO REMOVE, depricate code from when directions were still a thing
 
             foreach (char dir in directions) {
-                char oppDir = TileData.getOppDir(dir);
-                List<TileData> validConnections = getValidConnections(tileData.getEdge(dir), tileDirDict, oppDir);
+                List<TileData> validConnections = getValidConnections(tileData.getEdge(dir), tileCompendium, dir);
                 tileData.setAccDir(validConnections, dir);
+                EditorUtility.SetDirty(tileData); // Mark as dirty to ensure changes are saved
             }
         }
-
+        //TODO isn't actually saving after closing unity
         AssetDatabase.SaveAssets();
     }
 
@@ -44,23 +45,26 @@ public static class TileConnectionsParser {
         }
 
         // Output the list or do something with it
-        //Debug.Log($"Loaded {tileDataList.Count} TileData assets from {path}");
+         Debug.Log($"Loaded {tileCompendium.Count} TileData assets from {path}");
 
         return tileCompendium;
     }
 
-    static string getTileDirections(TileData tileData) {
-        string tileName = tileData.tile.name;
-        string directions = tileName.Split("_")[directionsIndex];
-        return directions;
-    }
+    //static string getTileDirections(TileData tileData) {
+    //   string tileName = tileData.name;
+    //    string directions = tileName.Split("_")[directionsIndex];
+    //    return directions;
+    //}
 
     //This is being done to support varients of same tile
+    //And increase look up time for large tile sets
+    //TODO reimplement but with edge types
+    /*
     static Dictionary<char, List<TileData>> convertTileCompToDict(List<TileData> tileCompendium) {
         Dictionary<char, List<TileData>> tileDirDict = new Dictionary<char, List<TileData>>();
         
         foreach(TileData tile in tileCompendium) { 
-             foreach(char direction in getTileDirections(tile)) {
+             foreach(char direction in directions) {
                 if (!tileDirDict.ContainsKey(direction)) {
                     tileDirDict[direction] = new List<TileData>();
                 }
@@ -69,37 +73,44 @@ public static class TileConnectionsParser {
         }
         return tileDirDict;
     }
+    */
 
     //checks for tile edge type
-    static List<TileData> getValidConnections(List<EdgeType> tileEdge, Dictionary<char, List<TileData>> tileDirDict, char oppDir) {
-        List<TileData> possibleNeighbours = tileDirDict[oppDir];
+    static List<TileData> getValidConnections(List<EdgeType> tileEdge, List<TileData> tileCompendium, char dir) {
+        char oppDir = TileData.getOppDir(dir); 
         List<TileData> validNeighbours = new List<TileData>();
-
+    
         //TODO type checking not goods
-        foreach(TileData neighbor in possibleNeighbours) {
-            if (isValidConnecction(tileEdge,neighbor.getEdge(oppDir),oppDir)) {
+        foreach(TileData neighbor in tileCompendium) {
+            if (isValidConnecction(tileEdge,neighbor.getEdge(oppDir),dir)) {
                 validNeighbours.Add(neighbor);
             }
         }
 
         return validNeighbours;
     }
+    
 
-    //TODO im not sure if this is correct
-    static bool isValidConnecction(List<EdgeType> tileEdge, List<EdgeType> neighborTileEdge, char oppDir) {
-        if (tileEdge.SequenceEqual(neighborTileEdge)) return true; //co-linear tiles border tiles
+    //TODO im not sure if this is correct 
+    static bool isValidConnecction(List<EdgeType> tileEdge, List<EdgeType> neighborTileEdge, char dir) {
+        //cant match mixed tile edge with non mixed tile edge
+        if (tileEdge.Count != neighborTileEdge.Count) return false;
 
-        if(tileEdge.Count == 1 && neighborTileEdge.Count == 1) {
-            if (compareEdges(tileEdge, neighborTileEdge, oppDir)) return true; //
-        }
+        //co-linear tiles; intended solution (sand top, water bottom; propigate itself left and right)
+        //TODO this can be problem matic take for example (sand top, water bottom; and propigate istelf up)
+        if (tileEdge.SequenceEqual(neighborTileEdge)) return true;
+
+       // if (compareEdges(tileEdge, neighborTileEdge, dir)) return true;
+
+
         return false;
     }
 
+    //TODO rename/refactor
     //TODO put im tileData class?
     //compares if the edge type of tile matches with the neighbors edge type
-    static bool compareEdges(List<EdgeType> edge, List<EdgeType> neighborEdge, char oppDir) {
-        //TODO check
-        switch (oppDir) {
+    static bool compareEdges(List<EdgeType> edge, List<EdgeType> neighborEdge, char dir) {
+        switch (dir) {
             case 'U': return edge[0] == neighborEdge.Last();
             case 'D': return edge.Last() == neighborEdge[0];
             case 'L': return edge[0] == neighborEdge.Last();

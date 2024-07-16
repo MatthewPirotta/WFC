@@ -65,7 +65,11 @@ public class DebugWFS : MonoBehaviour
             }
         }
     }
-
+    //TODO
+    //Toggling item off, breaks references and stops them from being updated.
+    //GetComponent<Renderer>().enabled = false
+    //GetComponent<CanvasRenderer>().cull = false
+    //Meshrender?
     public void toggleDebug() {
         foreach (Transform child in debugParent) {
             child.gameObject.SetActive(!child.gameObject.activeSelf);

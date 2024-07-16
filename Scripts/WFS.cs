@@ -18,7 +18,7 @@ public class WFS : MonoBehaviour {
     [SerializeField] Tilemap tilemap;
     Node[,] grid = new Node[width, height];
 
-    [SerializeField] List<TileData> allConnections; //TODO
+    [SerializeField] List<TileData> allConnections; //TODO, automate
 
     [SerializeField] DebugWFS debugWFS;
     public bool collapseAll = false;
@@ -33,7 +33,7 @@ public class WFS : MonoBehaviour {
         debugWFS.initDebug();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                //making a copy to prevent nodes affecting each other
+                //making a new instance to prevent nodes affecting each other (stop unintential pass by reference)
                 grid[x, y] = new Node(new List<TileData>(allConnections), new Vector2Int(x,y));
             }
         }
@@ -44,7 +44,7 @@ public class WFS : MonoBehaviour {
         Node nodeToCollapse;
         do {
             nodeToCollapse = FindLowestEntropyNode(grid);
-            Debug.Log($"Node to collapse Entropy: {nodeToCollapse.entropy}");
+            //Debug.Log($"Node to collapse Entropy: {nodeToCollapse.entropy}");
             if (nodeToCollapse.entropy == 0) break; //No more nodes to collapse
 
             CollapseNode(nodeToCollapse);
@@ -62,46 +62,60 @@ public class WFS : MonoBehaviour {
         node.connections.Clear();
         node.connections.Add(chosenTile);
         node.entropy = 0;
-        node.collapsed = true;
+        node.isCollapsed = true;
         tilemap.SetTile(new Vector3Int(node.coord.x, node.coord.y), chosenTile.tile);
 
         Propogate(node);
     }
 
     //Update the tile restrictions to neighbouring nodes
+    //TODO make this cleaner, use dir for the getting
     void Propogate(Node node) {
-        Vector2Int coord = node.coord;
         Vector2Int newCoord;
         Node neighborNode;
 
         for(int i = 0; i<offsets.Length; i++) {
-            newCoord = coord + offsets[i];
+            newCoord = node.coord + offsets[i];
             if (!isInGrid(newCoord)) continue;
             neighborNode = grid[newCoord.x, newCoord.y];
-            if (neighborNode.collapsed) continue;
+            if (neighborNode.isCollapsed) continue;
 
-            Debug.Log($"Node: {node.coord} propogating to neighbor {neighborNode.coord}");
+            //Debug.Log($"Node: {node.coord} propogating to neighbor {neighborNode.coord}");
 
             //TODO check that this is correct
             switch (i) {
-                case 1: whittleConnections(neighborNode, node.connections[0].accD); break; //up
-                case 2: whittleConnections(neighborNode, node.connections[0].accU); break; //down
-                case 3: whittleConnections(neighborNode, node.connections[0].accR); break; //left
-                case 4: whittleConnections(neighborNode, node.connections[0].accL); break; //right
+                case 0: whittleConnections(neighborNode, node.connections[0].accU); break; //up
+                case 1: whittleConnections(neighborNode, node.connections[0].accD); break; //down
+                case 2: whittleConnections(neighborNode, node.connections[0].accL); break; //left
+                case 3: whittleConnections(neighborNode, node.connections[0].accR); break; //right
             }
         }
     }
 
-    void whittleConnections(Node neighborNode, List<TileData> restrictions) {
+    void whittleConnections(Node neighborNode, List<TileData> sourceNodeRestrictions) {
         //copy is created to deal with deleating elements while iterating over list
         List<TileData> copyNeighborConnections = new List<TileData>(neighborNode.connections); 
 
         foreach (TileData possibleConnection in copyNeighborConnections) {
-            if (!restrictions.Contains(possibleConnection)) {
+            if (!sourceNodeRestrictions.Contains(possibleConnection)) {
                 neighborNode.connections.Remove(possibleConnection);
                 neighborNode.entropy--;
             }
         }
+
+       
+        string temp = $"Neighbor Node: {neighborNode.coord},\nSource Node Restrictions:";
+     
+        foreach (TileData restrictions in sourceNodeRestrictions) {
+            temp += $"{restrictions.name}, ";
+        }
+
+        temp += "\nRemianing conenctions:";
+
+        foreach (TileData possibleConnection in neighborNode.connections) {
+            temp += $"{possibleConnection.name}, ";
+        }
+        Debug.Log(temp);
     }
 
     bool isInGrid(Vector2Int coord) {
@@ -111,20 +125,29 @@ public class WFS : MonoBehaviour {
         return true;
     }
 
+    //TODO can be optimised with a list but nahhhh
     Node FindLowestEntropyNode(Node[,] grid) {
         int lowestEntropy = int.MaxValue;
-        Node node = new Node();
+        Node LowestEntropyNode = new Node();
+        Node tempNode;
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (grid[x, y].entropy == 0) continue; //already collapsed
-                if (grid[x, y].entropy < lowestEntropy) {
+                tempNode = grid[x, y];
+                if (tempNode.isCollapsed) continue;
+                if (tempNode.entropy == 0) {
+                    //TODO actually fix it
+                    Debug.LogWarning($"Node {tempNode.coord.x},{tempNode.coord.y} failed to collapse");
+                    continue;
+                }
+
+                if (tempNode.entropy < lowestEntropy) {
                     lowestEntropy = grid[x, y].entropy;
-                    node = grid[x, y];
+                    LowestEntropyNode = grid[x, y];
                 }
             }
         }
-        return node;
+        return LowestEntropyNode;
     }
 
 

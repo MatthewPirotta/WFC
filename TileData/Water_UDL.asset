@@ -12,12 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0070decadf4d0c429fb4319a00db29d, type: 3}
   m_Name: Water_UDL
   m_EditorClassIdentifier: 
-  tile: {fileID: 11400000, guid: 934812fe51d2b6140be22242cc24a04e, type: 2}
+  tile: {fileID: 11400000, guid: f99960ee83d9cd2448c089fb5c091427, type: 2}
   edgeU: 0000000001000000
   edgeD: 0000000001000000
   edgeL: 00000000
   edgeR: 01000000
-  accU: []
-  accD: []
-  accL: []
-  accR: []
+  accU:
+  - {fileID: 11400000, guid: da1f0d4f3e0fb1b4999946fdcca3c498, type: 2}
+  - {fileID: 11400000}
+  accD:
+  - {fileID: 11400000}
+  - {fileID: 11400000, guid: c39333e517f74e74985bcc8b6ecb6bd3, type: 2}
+  accL:
+  - {fileID: 11400000, guid: d6e320cbcd238a94688290eeaf265432, type: 2}
+  - {fileID: 11400000, guid: b35abfd8172916a42aa2c7d08da22c8c, type: 2}
+  accR:
+  - {fileID: 11400000, guid: df8ac363cd9a7cf4f959b74ea762f91f, type: 2}
+  - {fileID: 11400000, guid: 39f081f522efb074cb4fd91fe5bcd381, type: 2}
+  - {fileID: 11400000, guid: b35abfd8172916a42aa2c7d08da22c8c, type: 2}
+  - {fileID: 11400000, guid: d2fce49c0e786aa4ba28bbd68fc1a05e, type: 2}
