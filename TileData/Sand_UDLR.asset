@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Sand_UDLR
   m_EditorClassIdentifier: 
   tile: {fileID: 11400000, guid: 1bddbea8645ef6a4eb5e42a6199f8a7c, type: 2}
+  weight: 4
   edgeU: 01000000
   edgeD: 01000000
   edgeL: 01000000

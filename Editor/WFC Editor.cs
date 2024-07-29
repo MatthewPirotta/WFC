@@ -12,7 +12,7 @@ public class WFCEditor : Editor {
         WFS wfs = (WFS) target;
 
         if(GUILayout.Button("Initilise Grid")) {
-            wfs.InitGrid();
+            wfs.innitWorldSpace();
         }
 
         if (GUILayout.Button("Collapse Next")) {

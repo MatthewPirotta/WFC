@@ -7,7 +7,7 @@ using System.Linq;
 public static class TileConnectionsParser {
     [MenuItem("Tools/Load TileData")]
     public static void setConnecetions() {
-        List<TileData> tileCompendium = TileData.LoadAllTileData();
+        List<TileData> tileCompendium = MyGrid.LoadAllTileData();
         //Dictionary<char, List<TileData>> tileDirDict = convertTileCompToDict(tileCompendium);
 
         foreach (TileData tileData in tileCompendium) {

@@ -1,51 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.Linq;
+using UnityEditor.Experimental.GraphView;
 
 public class WFS : MonoBehaviour {
-    //All these nums are arbritraty 
-    const int width = 20;
-    const int height = 15;
-    const int area = width * height;
-    const int backupInterval = area / 10; //makes backup in 1/10th intervals
-    const long maxItr = area * 4; // stop after what would be generating the world 3 times (ignoring all generation failures)
+    MyGrid workingGrid;
+    MyGrid backupGrid;  //Note this solution is memory intensive O(n^2)
 
-    [SerializeField] Tilemap tilemap;
-    Node[,] grid = new Node[width, height];
-    int relIterCnt, totIterCnt = 0;
-
-    //Note this solution is memory intensive O(n^2)
-    Node[,] gridBackup = new Node[width, height]; 
-    int iterCntBackup = 0;
-
-    [Tooltip("This is automatically being loaded from Assets/TileData")]
-    [SerializeField] List<TileData> allConnections;
+    //TODO const for backupInterval and maxItr
+    int backupInterval = MyGrid.AREA / 10; //makes backup in 1/10th intervals
+    long maxItr = MyGrid.AREA * 5; // stop after what would be generating the world 3 times (ignoring all generation failures)
+    int maxBacktrackFailures = 10;
+    [SerializeField] int totIterCnt = 0;
 
     [SerializeField] DebugWFS debugWFS;
     public bool collapseAll = false;
 
+    [SerializeField] int seed = 42;
+    [SerializeField] int sameTileBias = 1;
+    System.Random random;
+
     void Start() {
-        InitGrid();
+        innitWorldSpace();
         WFC();
     }
 
-    public void InitGrid() {
-        allConnections = TileData.LoadAllTileData();
-        tilemap.ClearAllTiles();
-        relIterCnt = 0;
+    public void innitWorldSpace() {
         totIterCnt = 0;
-        iterCntBackup = 0;
+        resetWorldSpace();
+    }  
+
+    void resetWorldSpace() {
+        MyGridRenderer.tilemap.ClearAllTiles();
+        workingGrid = new MyGrid();
+        backupGrid = new MyGrid();
+        random = new System.Random(seed);
 
         debugWFS.initDebug();
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                //making a new instance to prevent nodes affecting each other (stop unintential pass by reference)
-                grid[x, y] = new Node(new List<TileData>(allConnections), new Vector2Int(x,y));
-                gridBackup[x,y] = new Node(new List<TileData>(allConnections), new Vector2Int(x, y));
-            }
-        }
-        debugWFS.updateDebugDisplay(grid);
+        debugWFS.updateDebugDisplay(workingGrid.nodeGrid);
     }
 
     public void WFC() {
@@ -53,33 +48,38 @@ public class WFS : MonoBehaviour {
         do {
             //counters are done before trying to collapse,
             //to prevent infinite loops, where there a non solveable checkpoint is created
-            relIterCnt++;
+            workingGrid.itrCnt++;
             totIterCnt++;
 
-            nodeToCollapse = FindLowestEntropyNode(grid);
+            nodeToCollapse = FindLowestEntropyNode(workingGrid.nodeGrid);
             //Debug.Log($"Node to collapse Entropy: {nodeToCollapse.entropy}");
             if (nodeToCollapse.isCollapsed) break; //No more nodes to collapse
 
-            if(nodeToCollapse.entropy == 0) {
-                Debug.LogWarning($"Node {nodeToCollapse.coord} failed to collapse");
-                backTrack(grid, gridBackup);
+            //Reset world if world gen, if there is non solveable constraints after backup
+            if (workingGrid.backtrackCntRelBackup == maxBacktrackFailures) {
+                Debug.LogWarning("Reached max backtrack count relative to bakcup");
+                resetWorldSpace();
+                continue;
+            }
+
+            if(nodeToCollapse.possConnections.Count == 0) {
+                Debug.Log($"Node {nodeToCollapse.coord} failed to collapse");
+                MyGrid.backTrack(workingGrid, backupGrid);
                 continue;
             }
            
             CollapseNode(nodeToCollapse);
-           // Debug.Log("calling update Debug Display");
-            debugWFS.updateDebugDisplay(grid);
            
             //TODO techinally off by 1, but who really cares
-            if (relIterCnt % backupInterval == 0) {
-                backupGrid(grid,gridBackup);
+            if (workingGrid.itrCnt % backupInterval == 0) {
+                MyGrid.backupGrid(workingGrid, backupGrid);
             }
 
-            Debug.Log(totIterCnt);
+            //Debug.Log(totIterCnt);
 
             //stop infinite loops
             if(totIterCnt >= maxItr) {
-                Debug.Log("Reach max iteration");
+                Debug.LogWarning("Reach max iteration");
             }
         } while (collapseAll && totIterCnt < maxItr);
     }
@@ -89,79 +89,98 @@ public class WFS : MonoBehaviour {
         //TODO make this weighted
         //extra weight for same tile
         //weighting in general to control world gen / biomes
-        TileData chosenTile = node.connections[Random.Range(0, node.connections.Count)];
+
+        TileData chosenTile = selectWeightedRandomTile(node);
+        //TileData chosenTile = node.possConnections[random.Next(0, node.possConnections.Count)];
 
 
         //Debug.Log($"node count: {node.connections.Count}");
         //Debug.Log($"randNum: {Random.Range(0, node.connections.Count)}");
-        node.connections.Clear();
-        node.connections.Add(chosenTile);
+        node.possConnections.Clear();
+        node.possConnections.Add(chosenTile);
         node.entropy = 0;
         node.isCollapsed = true;
-        tilemap.SetTile(new Vector3Int(node.coord.x, node.coord.y), chosenTile.tile);
+        MyGridRenderer.tilemap.SetTile(new Vector3Int(node.coord.x, node.coord.y), chosenTile.tile);
 
         Propogate(node);
+        // Debug.Log("calling update Debug Display");
+        //Debug.Log($"Before UpdateDebugDisplay. {node.coord} entropy: {node.entropy}");
+        debugWFS.updateDebugDisplay(workingGrid.nodeGrid);
     }
 
-    void chooseTile(Node node) {
+    TileData selectWeightedRandomTile(Node node) {
+        //calc totalWeight which is needed for weighted selection
+        int totalWeight = 0;
+        foreach (TileData possTile in node.possConnections) {
+            totalWeight += possTile.weight;
+            // account for the sameTileBias
+            if (possTile.Equals(node.possConnections[0])) {
+                totalWeight += sameTileBias; 
+            }
+        }
 
+        int ranNum = random.Next(0, totalWeight);
+        int cumulativeWeight = 0;
+        foreach (TileData possTile in node.possConnections) {
+            cumulativeWeight += possTile.weight;
+
+            //making same tile more likely, to encourage larger patches
+            if (possTile.Equals(node.possConnections[0])) {
+                cumulativeWeight += sameTileBias;
+            } 
+            
+           
+            if (cumulativeWeight > ranNum ) return possTile;
+        }
+
+        Debug.LogError(":(");
+        //arbiturarily return first valid node
+        return node.possConnections[0];
     }
 
     //Update the tile restrictions to neighbouring nodes
+    //TODO make more eleganto
     void Propogate(Node node) {
         Vector2Int newCoord;
         Node neighborNode;
 
-        foreach(char dir in TileData.directions) {
+        foreach (char dir in TileData.directions) {
             newCoord = node.coord + TileData.getOffset(dir);
 
-            if (!isInGrid(newCoord)) continue;
-            neighborNode = grid[newCoord.x, newCoord.y];
+            if (!MyGrid.isInGrid(newCoord)) continue;
+            neighborNode = workingGrid.nodeGrid[newCoord.x, newCoord.y];
             if (neighborNode.isCollapsed) continue;
 
             //Debug.Log($"Node: {node.coord} propogating to neighbor {neighborNode.coord}");
 
-            whittleConnections(neighborNode, node.connections[0].getAccDir(dir));
-        }
-
-        bool isInGrid(Vector2Int coord) {
-            if (coord.x < 0 || coord.y < 0) return false; //underflow
-                                                          //co-ordinates starts count from 0
-            if (coord.x > (width - 1) || coord.y > (height - 1)) return false; //overflow
-            return true;
+            whittleConnections(neighborNode, node.possConnections[0].getAccDir(dir));
         }
     }
 
     void whittleConnections(Node neighborNode, List<TileData> sourceNodeRestrictions) {
+        //Debug.Log($"WhittleConnections before calling CalcEntropy. {neighborNode.coord} entropy: {neighborNode.entropy}");
         //copy is created to deal with deleating elements while iterating over list
-        List<TileData> copyNeighborConnections = new List<TileData>(neighborNode.connections); 
+
+        printList(neighborNode.possConnections, $"Neighnor coord: {neighborNode.coord} Before Whittleing Connections\t");
+        printList(sourceNodeRestrictions, "sourceNodeRestrictions:");
+
+        List<TileData> copyNeighborConnections = new List<TileData>(neighborNode.possConnections); 
 
         foreach (TileData possibleConnection in copyNeighborConnections) {
             if (!sourceNodeRestrictions.Contains(possibleConnection)) {
-                neighborNode.connections.Remove(possibleConnection);
-                neighborNode.entropy--;
+                neighborNode.possConnections.Remove(possibleConnection);
             }
         }
 
-       /*
-        string temp = $"Neighbor Node: {neighborNode.coord},\nSource Node Restrictions:";
-     
-        foreach (TileData restrictions in sourceNodeRestrictions) {
-            temp += $"{restrictions.name}, ";
-        }
+        neighborNode.entropy = neighborNode.calcEntropy();
 
-        temp += "\nRemianing conenctions:";
-
-        foreach (TileData possibleConnection in neighborNode.connections) {
-            temp += $"{possibleConnection.name}, ";
-        }
-        Debug.Log(temp);
-       */
+        //Debug.Log($"WhittleConnections after calling CalcEntropy. {neighborNode.coord} entropy: {neighborNode.entropy}");
+        printList(neighborNode.possConnections, $"Neighnor coord: {neighborNode.coord} After Whittleing Connections\t");
     }
 
     //TODO can be optimised with a list but nahhhh
     Node FindLowestEntropyNode(Node[,] grid) {
-        int lowestEntropy = int.MaxValue;
+        float lowestEntropy = float.MaxValue;
         Node LowestEntropyNode = new Node();
 
         // if no uncollapsed node is found, then generation is complete
@@ -170,11 +189,10 @@ public class WFS : MonoBehaviour {
         LowestEntropyNode.isCollapsed = true; 
         Node tempNode;
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < MyGrid.WIDTH; x++) {
+            for (int y = 0; y < MyGrid.HEIGHT; y++) {
                 tempNode = grid[x, y];
                 if (tempNode.isCollapsed) continue;
-                if (tempNode.entropy == 0) return tempNode; // generation failed
 
                 if (tempNode.entropy < lowestEntropy) {
                     lowestEntropy = grid[x, y].entropy;
@@ -185,46 +203,6 @@ public class WFS : MonoBehaviour {
         return LowestEntropyNode;
     }
 
-    void backupGrid(Node[,] grid, Node[,] gridBackup) {
-        Debug.Log($"Backup is being performed on iteration:{relIterCnt}");
-        //Deep copy (by value must be made of the grid and it's elements)
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                gridBackup[x, y] = new Node(grid[x, y]);
-            }
-        }
-        iterCntBackup = relIterCnt;
-    }
-
-    void backTrack(Node[,] grid, Node[,] gridBackup) {
-        Debug.Log("back track is being performed");
-        revertToGridBackup(grid, gridBackup);
-        redrawTileMap();
-        
-
-        void revertToGridBackup(Node[,] grid, Node[,] gridBackup) {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    grid[x, y] = new Node(gridBackup[x, y]);
-                }
-            }
-            relIterCnt = iterCntBackup;
-        }
-
-        void redrawTileMap() {
-            tilemap.ClearAllTiles();
-            Node node;
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    node = grid[x, y];
-                    if (!node.isCollapsed) continue;
-                    tilemap.SetTile(new Vector3Int(node.coord.x, node.coord.y), node.connections[0].tile);
-                }
-            }
-        }
-    }
-
-
     // Debuging 
 
     public void toggleDebugDisplay() {
@@ -232,11 +210,19 @@ public class WFS : MonoBehaviour {
     }
 
     public void printEntropy() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Debug.Log($"{x},{y}: entropy = {grid[x, y].entropy}");
+        for (int x = 0; x < MyGrid.WIDTH; x++) {
+            for (int y = 0; y < MyGrid.HEIGHT; y++) {
+                Debug.Log($"{x},{y}: entropy = {workingGrid.nodeGrid[x, y].entropy}");
             }
         }
+    }
+
+    public void printList<T>(List<T> myList, string msg = "") {
+        string output = msg;
+        foreach (T t in myList) {
+            output += t.ToString() + ", ";
+        }
+        Debug.Log(output);
     }
 }
 

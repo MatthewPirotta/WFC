@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Water_UDLR
   m_EditorClassIdentifier: 
   tile: {fileID: 11400000, guid: 0f9e6db457c111c4198b55d94d5d8a5d, type: 2}
+  weight: 6
   edgeU: 00000000
   edgeD: 00000000
   edgeL: 00000000

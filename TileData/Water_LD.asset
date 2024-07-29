@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Water_LD
   m_EditorClassIdentifier: 
   tile: {fileID: 11400000, guid: fcf36d7fcc753bd4aaf27d8dbf6ab4ad, type: 2}
+  weight: 1
   edgeU: 01000000
   edgeD: 0000000001000000
   edgeL: 0100000000000000

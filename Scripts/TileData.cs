@@ -8,11 +8,10 @@ using UnityEngine.Assertions;
 
 [CreateAssetMenu(fileName = "WFCTile", menuName = "ScriptableObjects/TileData")]
 [SerializeField]
-public class TileData : ScriptableObject
-{
+public class TileData : ScriptableObject {
     public Tile tile;
-    public const string directions = "UDLR"; //Used in for loops to traverse all possible direction
-
+    public const string directions = "UDLR"; //Used in for loops to traverse all possible direction //TODO refactor ito MyGrod?
+    public int weight = 1;
 
     //Order Matters
     //First edge type is what is on 'top'/'right'
@@ -28,7 +27,6 @@ public class TileData : ScriptableObject
     public List<TileData> accD;
     public List<TileData> accL;
     public List<TileData> accR;
-
 
     public List<EdgeType> getEdge(char dir) {
         switch (dir) {
@@ -80,26 +78,22 @@ public class TileData : ScriptableObject
         return Vector2Int.zero;
     }
 
-    public static List<TileData> LoadAllTileData() {
-        // Path to the folder containing your ScriptableObjects
-        string path = "Assets/TileData";
+    public override bool Equals(object other) {
+        if (other == null) return false;
+        if (GetType() != other.GetType()) return false;
 
-        // Load all assets of type TileData from the specified folder
-        string[] assetGuids = AssetDatabase.FindAssets("t:TileData", new[] { path });
-        List<TileData> tileCompendium = new List<TileData>();
+        TileData otherTileData = (TileData) other;
 
-        foreach (string guid in assetGuids) {
-            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            TileData tileData = AssetDatabase.LoadAssetAtPath<TileData>(assetPath);
-            if (tileData != null) {
-                tileCompendium.Add(tileData);
-            }
-        }
+        return tile.Equals(otherTileData.tile);
+    }
 
-        // Output the list or do something with it
-        //Debug.Log($"Loaded {tileCompendium.Count} TileData assets from {path}");
+    public override int GetHashCode() {
+        if (tile == null) return 0;
+        return tile.GetHashCode();
+    }
 
-        return tileCompendium;
+    public override string ToString() {
+        return tile.name;
     }
 }
 

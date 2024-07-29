@@ -6,12 +6,9 @@ using UnityEngine;
 //[ExecuteAlways]
 public class DebugWFS : MonoBehaviour
 {
-    const int width = 20;
-    const int height = 15;
-
     [SerializeField] GameObject debugPrefab;
     [SerializeField] Transform debugParent;
-    GameObject[,] debugGrid = new GameObject[width, height];
+    GameObject[,] debugGrid = new GameObject[MyGrid.WIDTH, MyGrid.HEIGHT];
 
     public void initDebug() {
         //to prevent undefined behaviour
@@ -20,8 +17,8 @@ public class DebugWFS : MonoBehaviour
         //generating new instances
         Vector3 textCoord;
         Vector3 offset = new Vector3(0.5f, 0.5f);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < MyGrid.WIDTH; x++) {
+            for (int y = 0; y < MyGrid.HEIGHT; y++) {
                 textCoord = new Vector3Int(x, y) + offset;
                 GameObject debugObj = Instantiate(debugPrefab, textCoord, Quaternion.identity, debugParent);
                 debugObj.name = ($"{x},{y}");
@@ -51,10 +48,12 @@ public class DebugWFS : MonoBehaviour
     //This can be optimised by only chaning the updated blocks
     public void updateDebugDisplay(Node[,] grid) {
         TextMeshPro entropyText;
-        for(int x = 0; x < width;x++) {
-            for(int y = 0;y < height;y++) {
+        int roundedEntropy;
+        for (int x = 0; x < MyGrid.WIDTH;x++) {
+            for(int y = 0;y < MyGrid.HEIGHT; y++) {
                 entropyText = debugGrid[x, y].GetComponentInChildren<TextMeshPro>();
-                //Debug.Log($"Debug entropy at {x},{y} is {grid[x, y].entropy}");
+                //Debug.Log($"In updateDebugDisplay entropy at ({x}, {y}) is {grid[x, y].entropy}");
+                // roundedEntropy = Mathf.RoundToInt(grid[x, y].entropy);
                 entropyText.text = grid[x, y].entropy.ToString();
             }
         }
