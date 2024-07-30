@@ -7,19 +7,23 @@ using System.Linq;
 using UnityEditor.Experimental.GraphView;
 
 public class WFS : MonoBehaviour {
-    MyGrid workingGrid;
+    public MyGrid workingGrid;
     MyGrid backupGrid;  //Note this solution is memory intensive O(n^2)
 
     //TODO const for backupInterval and maxItr
     int backupInterval = MyGrid.AREA / 10; //makes backup in 1/10th intervals
     long maxItr = MyGrid.AREA * 5; // stop after what would be generating the world 3 times (ignoring all generation failures)
     int maxBacktrackFailures = 10;
-    [SerializeField] int totIterCnt = 0;
+    public int totIterCnt = 0;
+    public int totalBackupCnt = 0;
 
     [SerializeField] DebugWFS debugWFS;
-    public bool collapseAll = false;
 
-    [SerializeField] int seed = 42;
+    public bool collapseAll = false;
+    public int seed { get; } = 42;
+    
+
+
     [SerializeField] int sameTileBias = 1;
     System.Random random;
 
@@ -30,6 +34,7 @@ public class WFS : MonoBehaviour {
 
     public void innitWorldSpace() {
         totIterCnt = 0;
+        totalBackupCnt = 0;
         resetWorldSpace();
     }  
 
@@ -63,7 +68,7 @@ public class WFS : MonoBehaviour {
             }
 
             if(nodeToCollapse.possConnections.Count == 0) {
-                Debug.Log($"Node {nodeToCollapse.coord} failed to collapse");
+                //Debug.Log($"Node {nodeToCollapse.coord} failed to collapse");
                 MyGrid.backTrack(workingGrid, backupGrid);
                 continue;
             }
@@ -73,6 +78,7 @@ public class WFS : MonoBehaviour {
             //TODO techinally off by 1, but who really cares
             if (workingGrid.itrCnt % backupInterval == 0) {
                 MyGrid.backupGrid(workingGrid, backupGrid);
+                totalBackupCnt++;
             }
 
             //Debug.Log(totIterCnt);
@@ -86,12 +92,7 @@ public class WFS : MonoBehaviour {
 
     //select random tile to collape Node
     void CollapseNode(Node node) {
-        //TODO make this weighted
-        //extra weight for same tile
-        //weighting in general to control world gen / biomes
-
         TileData chosenTile = selectWeightedRandomTile(node);
-        //TileData chosenTile = node.possConnections[random.Next(0, node.possConnections.Count)];
 
 
         //Debug.Log($"node count: {node.connections.Count}");
@@ -161,8 +162,8 @@ public class WFS : MonoBehaviour {
         //Debug.Log($"WhittleConnections before calling CalcEntropy. {neighborNode.coord} entropy: {neighborNode.entropy}");
         //copy is created to deal with deleating elements while iterating over list
 
-        printList(neighborNode.possConnections, $"Neighnor coord: {neighborNode.coord} Before Whittleing Connections\t");
-        printList(sourceNodeRestrictions, "sourceNodeRestrictions:");
+        //printList(neighborNode.possConnections, $"Neighnor coord: {neighborNode.coord} Before Whittleing Connections\t");
+        //printList(sourceNodeRestrictions, "sourceNodeRestrictions:");
 
         List<TileData> copyNeighborConnections = new List<TileData>(neighborNode.possConnections); 
 
@@ -175,11 +176,11 @@ public class WFS : MonoBehaviour {
         neighborNode.entropy = neighborNode.calcEntropy();
 
         //Debug.Log($"WhittleConnections after calling CalcEntropy. {neighborNode.coord} entropy: {neighborNode.entropy}");
-        printList(neighborNode.possConnections, $"Neighnor coord: {neighborNode.coord} After Whittleing Connections\t");
+        //printList(neighborNode.possConnections, $"Neighnor coord: {neighborNode.coord} After Whittleing Connections\t");
     }
 
     //TODO can be optimised with a list but nahhhh
-    Node FindLowestEntropyNode(Node[,] grid) {
+    public Node FindLowestEntropyNode(Node[,] grid) {
         float lowestEntropy = float.MaxValue;
         Node LowestEntropyNode = new Node();
 

@@ -8,8 +8,8 @@ using UnityEngine.Tilemaps;
 //TODO struct?
 public class MyGrid {
     //All these nums are arbritraty 
-    public const int WIDTH = 25;
-    public const int HEIGHT = 20;
+    public const int WIDTH = 10;
+    public const int HEIGHT = 8;
     public static int AREA => WIDTH * HEIGHT;
 
     public List<TileData> allConnections { get; private set; }  //TODO static or maybe extract all this data into a struct?
