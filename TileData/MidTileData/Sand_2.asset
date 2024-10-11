@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0070decadf4d0c429fb4319a00db29d, type: 3}
+  m_Name: Sand_2
+  m_EditorClassIdentifier: 
+  tile: {fileID: 11400000, guid: 4c555763f1ce820438d0cddd7089fbcf, type: 2}
+  weight: 1
+  enableLayerAbove: 0
+  edgeU: 02000000
+  edgeD: 0200000000000000
+  edgeL: 02000000
+  edgeR: 0200000000000000
+  accU:
+  - {fileID: 11400000, guid: 3931d895d963cbc4eaff8c83ec86fb51, type: 2}
+  - {fileID: 11400000, guid: 520c582e2c9b86344ba2c75c5f49bc91, type: 2}
+  - {fileID: 11400000, guid: c315cb7e74f2df7448b4bba3dbe8aa4d, type: 2}
+  - {fileID: 11400000, guid: eb45aa7edc9856f43b99b5d8a9c86276, type: 2}
+  accD:
+  - {fileID: 11400000, guid: 2ba10e49a3f01dd4689e6fde22c14753, type: 2}
+  - {fileID: 11400000, guid: 520c582e2c9b86344ba2c75c5f49bc91, type: 2}
+  - {fileID: 11400000, guid: ee8982c73d4e7b042a51922be12d60d4, type: 2}
+  - {fileID: 11400000, guid: 8e3c1d4f7ddb30b4db2ae2280750610b, type: 2}
+  accL:
+  - {fileID: 11400000, guid: 3931d895d963cbc4eaff8c83ec86fb51, type: 2}
+  - {fileID: 11400000, guid: eb45aa7edc9856f43b99b5d8a9c86276, type: 2}
+  - {fileID: 11400000, guid: 954e9d12397111644857f8df0a3e0a56, type: 2}
+  - {fileID: 11400000, guid: ea35967ff09fdd74183917c48336b3e6, type: 2}
+  accR:
+  - {fileID: 11400000, guid: 954e9d12397111644857f8df0a3e0a56, type: 2}
+  - {fileID: 11400000, guid: 9b1cc9afd61ac0a448f149b2f8c4b730, type: 2}
+  - {fileID: 11400000, guid: ee8982c73d4e7b042a51922be12d60d4, type: 2}
+  - {fileID: 11400000, guid: 8e3c1d4f7ddb30b4db2ae2280750610b, type: 2}
