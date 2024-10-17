@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 //NOTE everyhting is static (cringe?)
-
 public class MyGridRenderer : MonoBehaviour
 {
     private static Tilemap[] tilemaps;

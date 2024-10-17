@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+//TODO this debug grid implementation is specfic to my implementation of MyGrid
 [ExecuteAlways]
 public class DebugGrid : MonoBehaviour {
-    [SerializeField] GameObject debugPrefab; //TODO somehowmake this constant throughout all instances
-    GameObject[,] debugGrid = new GameObject[MyGrid.WIDTH, MyGrid.HEIGHT];
+    [SerializeField] GameObject debugPrefab;
+    GameObject[,] debugGrid = new GameObject[MyGrid.WIDTH, MyGrid.WIDTH];
 
-    MyGrid grid;
+    IGrid grid;
 
     TextMeshPro prevEntropyText;
 
@@ -28,7 +29,7 @@ public class DebugGrid : MonoBehaviour {
 
 
     //TODO not happy
-    public void gridFactory(MyGrid grid) {
+    public void gridFactory(IGrid grid) {
         this.grid = grid;
     }
 
@@ -36,20 +37,20 @@ public class DebugGrid : MonoBehaviour {
 
     private void OnEnable() {
         //refreshing the whole grid since debug was last enabled
-        if(grid != null) {
+        if (grid != null) {
             //Debug.Log($"Updating! {transform.name}");
             updateDebugGrid(grid);
         }
 
-        WFS.collapsedNode += updateDebugNode;
-        WFS.updateGrid += updateDebugGrid;
-        WFS.propogateNodeData += updateDebugNode;
+        WFC.collapsedNode += updateDebugNode;
+        WFC.updateGrid += updateDebugGrid;
+        WFC.propogateNodeData += updateDebugNode;
     }
 
     private void OnDisable() {
-        WFS.collapsedNode -= updateDebugNode;
-        WFS.updateGrid -= updateDebugGrid;
-        WFS.propogateNodeData -= updateDebugNode;
+        WFC.collapsedNode -= updateDebugNode;
+        WFC.updateGrid -= updateDebugGrid;
+        WFC.propogateNodeData -= updateDebugNode;
     }
 
     private void Awake() {
@@ -92,31 +93,32 @@ public class DebugGrid : MonoBehaviour {
             DestroyImmediate(children[i].gameObject);
         }
     }
-
+        
 
     /// <summary>
     /// Updates the debug display for a specific node in the grid.
     /// </summary>
     /// <param name="node">The node data</param>
-    public void updateDebugNode(Node node) {
-        if (!MyGrid.isInGrid(node.coord)) return; // This function can be called with an invalid Node
+    public void updateDebugNode(IGrid collapseOngrid, Node node) {
+        if (grid == null) return; // grid reference has not been intialised yet
+        if (!collapseOngrid.isInGrid(node.coord)) return; // This function can be called with an invalid Node
+        if (!this.grid.Equals(collapseOngrid)) return; //This function can be called by actions working on other grids. 
 
-        GameObject debugObj = debugGrid[node.coord.x, node.coord.y];
-       
+        GameObject debugContainer = debugGrid[node.coord.x, node.coord.y];
 
         //Do not preview collapsed nodes
-        debugObj.SetActive(!node.isCollapsed);
+        debugContainer.SetActive(!node.isCollapsed);
         if (node.isCollapsed) {
             return;
         }
 
         //Update the preview for non collasped nodes
         //Debug.Log($"In updateDebugDisplay entropy at ({x}, {y}) is {grid[x, y].entropy}");
-        TextMeshPro entropyText = debugObj.GetComponentInChildren<TextMeshPro>();
+        TextMeshPro entropyText = debugContainer.GetComponentInChildren<TextMeshPro>();
         float roundedEntropy = (float)Math.Round(node.entropy, 1);
         entropyText.text = roundedEntropy.ToString();
 
-        previewPossConnections(debugObj, node);
+        previewPossConnections(debugContainer, node);
     }
 
     /// <summary>
@@ -125,20 +127,18 @@ public class DebugGrid : MonoBehaviour {
     /// <param name="grid"></param>
     /// <param name="cnts"></param>
     //TODO Counters really shouldn't be there
-    public void updateDebugGrid(MyGrid grid) {
-        for (int x = 0; x < MyGrid.WIDTH; x++) {
-            for (int y = 0; y < MyGrid.HEIGHT; y++) {
-                updateDebugNode(grid.nodeGrid[x, y]);
-            }
+    public void updateDebugGrid(IGrid grid) {
+        foreach (Node node in grid.getAllNodes()) {
+            updateDebugNode(grid, node);
         }
     }
 
-    public void highlightNextNodeToCollapse(Vector2Int collapseNodeCoord) {
-        if (!MyGrid.isInGrid(collapseNodeCoord)) return; // This function can be called with an invalid Node
+    public void highlightNextNodeToCollapse(IGrid grid, Vector2Int collapseNodeCoord) {
+        if (!grid.isInGrid(collapseNodeCoord)) return; // This function can be called with an invalid Node
 
         TextMeshPro currEntropyText;
         //TODO still need if statment
-        if (!MyGrid.isInGrid(collapseNodeCoord)) return;
+        if (!grid.isInGrid(collapseNodeCoord)) return;
         currEntropyText = debugGrid[collapseNodeCoord.x, collapseNodeCoord.y].GetComponentInChildren<TextMeshPro>();
 
 
@@ -159,48 +159,70 @@ public class DebugGrid : MonoBehaviour {
     }
 
     //Only preview the first 9 most probale tiles
-    void previewPossConnections(GameObject debugObj, Node node) {
-        const float nodeWH = 1;
-        float padding = 0.01f;
-        float sizeSubGrid = (float)(0.3 * nodeWH);
+    void previewPossConnections(GameObject debugContainer, Node node) {
+        const float nodeWidthHeight = 1;
+        const float padding = 0.01f;
+        const float gridScaleFactor = 0.3f; // 1/3 sacle to fit 9 preview tiles
+
+        float sizeSubGrid = (float)(gridScaleFactor * nodeWidthHeight);
         float baseScale = sizeSubGrid - padding;
-        
 
         //TODO ELERT NOTE HARD CODDED VALUE WHICH WILL TOTALLY NOT CAUSE PROBLEMS
-        Transform tileParent = debugObj.transform.GetChild(1);
-        destroyDebug(tileParent); //prevent gameobject pileup
+        Transform miniTileGridContainer = debugContainer.transform.Find("Tile Preview");
+        destroyDebug(miniTileGridContainer); //prevent gameobject pileup
 
-        //Unity does not support priority queue
+        //NOTE Unity does not support priority queue
         List<TileData> possConnections = new List<TileData>(node.possConnections);
         if (possConnections.Count == 0) return;
 
         //Dispaly the list in descending order of weight
         //TODO This doesnt account for same tile bias
         possConnections.Sort((a, b) => b.weight.CompareTo(a.weight));
+
         float largestWeight = possConnections[0].weight;
 
+        // Check if largestWeight is zero or NaN to prevent invalid scale calculations
+        if (largestWeight <= 0 || float.IsNaN(largestWeight)) {
+            Debug.LogError("Invalid largestWeight: " + largestWeight);
+            return;
+        }
+
+        createTileGrid(possConnections, miniTileGridContainer, sizeSubGrid, baseScale, largestWeight);
+
         //will generate a 3x3 grid from left to right, top to bottom
-        foreach(Vector2Int offset in debugTileOffsets) {
-            //No more possible tiles to preview
-            if (possConnections.Count == 0) return;
+        void createTileGrid(List<TileData> possibleConnections, Transform tileParent, float sizeSubGrid, float baseScale, float largestWeight) {
+            foreach (Vector2Int offset in debugTileOffsets) {
+                //No more possible tiles to preview
+                if (possConnections.Count == 0) return;
 
-            float x  = offset.x * sizeSubGrid;
+                Vector3 tilePosition = getTilePos(offset, sizeSubGrid);
+                GameObject tileDisplay = createTileDisplay(possConnections[0], tilePosition, tileParent, baseScale, largestWeight);
+
+                possConnections.RemoveAt(0);
+            }
+        }
+
+        Vector3 getTilePos(Vector2Int offset, float sizeSubGrid) {
+            float x = offset.x * sizeSubGrid;
             float y = offset.y * sizeSubGrid;
-           
+            return new Vector3(x, y, 0f);
+        }
 
-            GameObject tileDisplay = new GameObject($"{possConnections[0].name} {x}, {y}"); 
-            tileDisplay.transform.parent = tileParent;
-            tileDisplay.transform.localPosition = new Vector3(x, y);
+        GameObject createTileDisplay(TileData tiledata, Vector3 pos, Transform parent, float baseScale, float largestWeight) {
+            GameObject tileDisplay = new GameObject($"{tiledata.name} {pos.x}, {pos.y}");
+            tileDisplay.transform.parent = parent;
+            tileDisplay.transform.localPosition = pos;
+
             SpriteRenderer sr = tileDisplay.AddComponent<SpriteRenderer>();
-            sr.sprite = possConnections[0].tile.sprite;
+            sr.sprite = tiledata.tile.sprite;
             //TODO NOTE HARD CODED VALUES
             sr.sortingLayerName = "Grids";
             sr.sortingOrder = 100;
 
-            float weightedScale = baseScale * (possConnections[0].weight / largestWeight);
-            tileDisplay.transform.localScale = new Vector3(weightedScale, weightedScale);
+            float weightedScale = baseScale * (tiledata.weight / largestWeight);
+            tileDisplay.transform.localScale = new Vector3(weightedScale, weightedScale, 1f);
 
-            possConnections.RemoveAt(0);
+            return tileDisplay;
         }
     }
 

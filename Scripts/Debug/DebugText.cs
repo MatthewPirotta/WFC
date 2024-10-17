@@ -14,8 +14,8 @@ public class DebugText : MonoBehaviour
     [SerializeField] TextMeshProUGUI layerTxt;
 
     public DebugText() {
-        WFS.initWorld += setConstantInfo;
-        WFS.updataGameState += onUpdateCounters;
+        WFC.initWorld += setConstantInfo;
+        WFC.updataGameState += onUpdateCounters;
     }
 
     /// <summary>

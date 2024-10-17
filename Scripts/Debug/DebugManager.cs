@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,8 @@ public class DebugManager : MonoBehaviour
     [SerializeField] WorldGenerationManager worldGenManager;
     [SerializeField] GameObject debugGridPrefab;
 
-    GameObject[] debugGrids = new GameObject[3];
+    static int numLayers = Enum.GetNames(typeof(Layer)).Length;
+    GameObject[] debugGrids = new GameObject[numLayers];
 
     bool isDebugging = false;
     public bool IsDebugging {
@@ -34,7 +36,7 @@ public class DebugManager : MonoBehaviour
     } 
 
     public DebugManager() {
-        WFS.initWorld += initDebug;
+        WFC.initWorld += initDebug;
     }
 
     void toggleDebug(bool isActive) {
@@ -46,30 +48,39 @@ public class DebugManager : MonoBehaviour
         debugGrids[(int)selectedLayer].SetActive(isActive);
     }
 
-    //TODO useless parameter
     void initDebug() {
-        GameObject debugObj;
-        DebugGrid debugGrid;
-        MyGrid[] datagrids = worldGenManager.myGrids;
+        IGrid[] datagrids = worldGenManager.myGrids;
 
         clearDebugGrids();
 
+
         //NOTE the gridsArray is in generation order defined by Layers enum
         for (int i =0; i < datagrids.Length; i++) {
+            instantiateDebugGrid(i);
+        }
+
+        void instantiateDebugGrid(int layerIndex) {
+            GameObject debugObj;
+            DebugGrid debugGrid;
+
             debugObj = Instantiate(debugGridPrefab, transform);
             debugGrid = debugObj.GetComponent<DebugGrid>();
-            debugGrid.gridFactory(datagrids[i]);
-            debugObj.name = $"Debug Grid - {datagrids[i].layer}";
-            debugGrids[i] = debugObj;
+            debugGrid.gridFactory(datagrids[layerIndex]);
+            debugObj.name = $"Debug Grid - {datagrids[layerIndex].layer}";
+            debugGrids[layerIndex] = debugObj;
 
             debugObj.SetActive(false);
         }
     }
 
     void clearDebugGrids() {
-        foreach (GameObject debugGrid in debugGrids) {
-            if (debugGrid == null) continue;
-            DestroyImmediate(debugGrid);
+        // Loop through all child objects and destroy them
+        //When reebooting unity it can create duplicate debug objects
+        for (int i = transform.childCount - 1; i >= 0; i--) {
+            DestroyImmediate(transform.GetChild(i).gameObject);
         }
+
+        // Clear references after destruction
+        debugGrids = new GameObject[3];
     }
 }

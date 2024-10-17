@@ -1,10 +1,10 @@
 using UnityEngine;
 
 //TODO rename to WorldGenManager
-
+//TODO requires My Grid renderer
 [ExecuteInEditMode]
 public class WorldGenerationManager : MonoBehaviour {
-    [SerializeField] WFS wfs;
+    WFC wfs = new WFC();
     public MyGrid[] myGrids { get; private set; } = new MyGrid[3];
 
     private int layercnt = 0;
