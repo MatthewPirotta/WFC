@@ -1,0 +1,40 @@
+BUG:
+- On the top layer, consider three 3 tiles in a column. The bottom is air, the top is plank_UD, leaving no valid tile for to collapse.
+- The UD plank are touching each other from the left and right. Put a block edge type that doesnt allow neighbors. This would be mean that the 'air' block would aslo be block/empty?
+- Get Null reference error when using unity inspector to collapse nodes, after inspecting non related objects?
+- If there is a half generated world, WFC just autocompletes it when reluanching Unity?
+
+##Refactoring:
+- action delegate
+- Make code cleaner
+- reducing all my public properties -_-
+- Most of debug script doesnt need to be called if running collapse all
+- make use of ref keyword
+- acutally incoroporate getNeighbors function found in MyGrid class
+- Subrcibe events	onEnbale and onDisable
+- privat instances should start with "_"
+
+##Maintainability
+-Unit tests?
+-Docfx documentation and class diagrams
+-Make the pipeline process of importing a spritesheet and setting values simplier
+
+##Expand the project
+-dark water tile
+-World as list instead of 2d Array?
+-Reduce small patches; Smoothing algorhtims, flood fill
+-Tiles can have an OR for accepted bordering configurations
+-Create palm trees for top grid sprite. In general (multiple sprites to make one large sprite)
+
+##Outside feature scope
+-Pre seeding
+-Using DOTS, for parallelisation. (ECS? data driven approach)
+-Auto sample the tile to figure out the edge connection type
+-Biomes
+-generate in blocks
+
+##Honestly have no idea
+-Dual grid
+-dynamically generate the sprite/mesh
+-Tile connections be indepent of bordering
+-Automatically extract mirroring and symettry, to reduce num of tiles

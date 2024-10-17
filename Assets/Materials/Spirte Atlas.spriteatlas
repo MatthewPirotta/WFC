@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Spirte Atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 0
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+    - {fileID: 2800000, guid: d238f1a2b23437548a4dce2096197be6, type: 3}
+    - {fileID: 2800000, guid: c5c3b2e2b024965408c08fb96171f988, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 990608879, guid: d238f1a2b23437548a4dce2096197be6, type: 3}
+  - {fileID: -1695444956, guid: c5c3b2e2b024965408c08fb96171f988, type: 3}
+  - {fileID: -1615629516, guid: c5c3b2e2b024965408c08fb96171f988, type: 3}
+  - {fileID: 604457988, guid: c5c3b2e2b024965408c08fb96171f988, type: 3}
+  - {fileID: -1345041446, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 117187345, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 69390356, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 1265267333, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: -1881212301, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 1177576760, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 591548673, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 863440033, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: -2094797830, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: -235768853, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 925335949, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 863831694, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: -864334742, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 574843928, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: -1011364277, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  - {fileID: 1849365049, guid: 0260a9a5d6c01cf4fb545980c00903e2, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - bottomTileMap_0
+  - TopTileMap_2
+  - TopTileMap_1
+  - TopTileMap_0
+  - landTileMap_3
+  - landTileMap_2
+  - landTileMap_14
+  - landTileMap_1
+  - landTileMap_15
+  - landTileMap_0
+  - landTileMap_12
+  - landTileMap_7
+  - landTileMap_13
+  - landTileMap_6
+  - landTileMap_10
+  - landTileMap_5
+  - landTileMap_11
+  - landTileMap_4
+  - landTileMap_9
+  - landTileMap_8
+  m_RenderDataMap: {}
+  m_Tag: Spirte Atlas
+  m_IsVariant: 0
