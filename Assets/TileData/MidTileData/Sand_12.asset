@@ -15,10 +15,10 @@ MonoBehaviour:
   tile: {fileID: 11400000, guid: ffc7a32e9bd5cb04db1378ff7567a74c, type: 2}
   weight: 1
   enableLayerAbove: 0
-  edgeU: 0000000002000000
-  edgeD: 00000000
-  edgeL: 00000000
-  edgeR: 0200000000000000
+  edgeU: 0100000002000000
+  edgeD: 01000000
+  edgeL: 01000000
+  edgeR: 0200000001000000
   accU:
   - {fileID: 11400000, guid: 40f2410ce05ce8144bdeb4588287f6cb, type: 2}
   - {fileID: 11400000, guid: 954e9d12397111644857f8df0a3e0a56, type: 2}

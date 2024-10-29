@@ -15,20 +15,16 @@ MonoBehaviour:
   tile: {fileID: 11400000, guid: 9532ff7cea7fc574aa0178390297cc58, type: 2}
   weight: 1
   enableLayerAbove: 0
-  edgeU: 0000000002000000
-  edgeD: 0200000000000000
-  edgeL: 0000000002000000
-  edgeR: 0200000000000000
+  edgeU: 0100000002000000
+  edgeD: 0100000000000000
+  edgeL: 0100000002000000
+  edgeR: 0200000001000000
   accU:
   - {fileID: 11400000, guid: 40f2410ce05ce8144bdeb4588287f6cb, type: 2}
   - {fileID: 11400000, guid: 954e9d12397111644857f8df0a3e0a56, type: 2}
   - {fileID: 11400000, guid: ea35967ff09fdd74183917c48336b3e6, type: 2}
   - {fileID: 11400000, guid: 8e3c1d4f7ddb30b4db2ae2280750610b, type: 2}
-  accD:
-  - {fileID: 11400000, guid: 2ba10e49a3f01dd4689e6fde22c14753, type: 2}
-  - {fileID: 11400000, guid: 520c582e2c9b86344ba2c75c5f49bc91, type: 2}
-  - {fileID: 11400000, guid: ee8982c73d4e7b042a51922be12d60d4, type: 2}
-  - {fileID: 11400000, guid: 8e3c1d4f7ddb30b4db2ae2280750610b, type: 2}
+  accD: []
   accL:
   - {fileID: 11400000, guid: 40f2410ce05ce8144bdeb4588287f6cb, type: 2}
   - {fileID: 11400000, guid: 520c582e2c9b86344ba2c75c5f49bc91, type: 2}

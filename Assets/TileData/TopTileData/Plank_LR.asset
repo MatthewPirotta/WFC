@@ -17,8 +17,8 @@ MonoBehaviour:
   enableLayerAbove: 0
   edgeU: 00000000
   edgeD: 00000000
-  edgeL: 03000000
-  edgeR: 03000000
+  edgeL: 04000000
+  edgeR: 04000000
   accU:
   - {fileID: 11400000, guid: 3f4f21ca04b44354c927f31500a69019, type: 2}
   - {fileID: 11400000}

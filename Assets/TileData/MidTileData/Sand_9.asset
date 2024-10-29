@@ -16,13 +16,12 @@ MonoBehaviour:
   weight: 1
   enableLayerAbove: 0
   edgeU: 02000000
-  edgeD: 00000000
-  edgeL: 0200000000000000
-  edgeR: 0200000000000000
+  edgeD: 01000000
+  edgeL: 0200000001000000
+  edgeR: 0200000001000000
   accU:
   - {fileID: 11400000, guid: 3931d895d963cbc4eaff8c83ec86fb51, type: 2}
   - {fileID: 11400000, guid: 520c582e2c9b86344ba2c75c5f49bc91, type: 2}
-  - {fileID: 11400000, guid: c315cb7e74f2df7448b4bba3dbe8aa4d, type: 2}
   - {fileID: 11400000, guid: eb45aa7edc9856f43b99b5d8a9c86276, type: 2}
   accD:
   - {fileID: 11400000, guid: 5206cc43ef50fff49bca124dcd805fae, type: 2}

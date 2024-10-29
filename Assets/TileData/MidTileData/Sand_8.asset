@@ -15,9 +15,9 @@ MonoBehaviour:
   tile: {fileID: 11400000, guid: 482a14f83008c4f4c92cb5dd5735d0ab, type: 2}
   weight: 1
   enableLayerAbove: 0
-  edgeU: 0000000002000000
-  edgeD: 0000000002000000
-  edgeL: 00000000
+  edgeU: 0100000002000000
+  edgeD: 0100000002000000
+  edgeL: 01000000
   edgeR: 02000000
   accU:
   - {fileID: 11400000, guid: 40f2410ce05ce8144bdeb4588287f6cb, type: 2}

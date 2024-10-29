@@ -286,7 +286,6 @@ public class WFC{
         updataGameState?.Invoke(cnts, chosenGrid.layer);
     }
 
-    //TODO backup and backtrack needs to be on all the grids
     void backup(IGrid[] workingGrids) {
         cnts.relItrCnt = 0;
         cnts.relBacktrackCnt = 0;

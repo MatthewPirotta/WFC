@@ -45,11 +45,25 @@ public static class TileConnectionsParser {
     */
 
     //checks for tile edge type
+    /// <summary>
+    /// Get's all the possible neighboring tiles that satify the tile's conditions for a particular direction.
+    /// </summary>
+    /// <param name="tileEdge">The edge type of the tile being worked on</param>
+    /// <param name="tileSet">All possible tiles for that current layer</param>
+    /// <param name="dir">The side being worked on for said particular tile</param>
+    /// <returns></returns>
     static List<TileData> getValidConnections(List<EdgeType> tileEdge, List<TileData> tileSet, char dir) {
-        char oppDir = TileData.getOppDir(dir); 
         List<TileData> validNeighbours = new List<TileData>();
+        ///I want that tiles with air type will only connect to the pure air block
+        ///But other air edge objects are connecting to each other
+        ///This can be fixed if I add 'OR' to edge types?
+        //if (tileEdge.Contains(EdgeType.Air)) return validNeighbours; 
 
-        foreach(TileData neighbor in tileSet) {
+        //If working on the tile's left side, it will connect to the neighbor's right side, i.e the opposite side.
+        char oppDir = TileData.getOppDir(dir);
+
+
+        foreach (TileData neighbor in tileSet) {
             if (isValidConnecction(tileEdge,neighbor.getEdge(oppDir))) {
                 validNeighbours.Add(neighbor);
             }
