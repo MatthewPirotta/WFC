@@ -15,12 +15,17 @@ Each tile in the system has a manually defined rule set that governs which tiles
 ![Bot TileSet](Assets/Materials/Bot%20Tiles/bottomTileMap.png "Bot TileSet")
 ![Top TileSet](Assets/Materials/Top%20Tiles/TopTileMap.png "Top TileSet")
 
-#Generation Demo
+#Sample Generation
+![Sample Generation](ImageVideos/FinalGeneration.png "Sample Generation")
 
-#Debug system
+# Debug system
 The project includes a simple but effective debug system to help visualize how the Wave Function Collapse algorithm operates. For any given layer, it displays the set of possible tiles that can still be placed at each node. These tiles are scaled based on their likelihood of being selected, giving a quick visual cue about the current tile probabilities. Additionally, each node's entropy (representing the value of valid options remaining).
+![Sample Debug](ImageVideos/debugSystem.png "Sample Debug")
 
-#Unit Tests
+# Generation Demo
+![Full Demo](ImageVideos/demo.pmp4 "Full Demo")
+
+# Unit Tests
 Unit tests were written for core components like the nodes and tile data to ensure the system behaves as expected and remains reliable as it evolves.
 
 #Possible Ideas for the future
