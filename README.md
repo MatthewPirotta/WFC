@@ -3,7 +3,7 @@ Wave Function Collapse
 
 # About the Project
 
-This project implements the Wave Function Collapse (WFC) algorithm in Unity using a tile grid approach. All tile assets were hand-designed using custom pixel art created specifically for this system.
+This project implements the Wave Function Collapse (WFC) algorithm in Unity using a tile grid approach.
 
 To enhance the flexibility and reduce the number of handcrafted tiles required, I developed a multi-layer approach. This custom method allows for more complex and varied outputs while minimizing the need to manually design a large number of individual tile combinations. It balances visual diversity with development efficiency, making the system more scalable for larger or more detailed environments.
 
@@ -11,6 +11,7 @@ To enhance the flexibility and reduce the number of handcrafted tiles required, 
 Each tile in the system has a manually defined rule set that governs which tiles it can connect to and on which sides. For example, a horizontal land tile may only connect to sand tiles on its left and right edges. To streamline this process, a helper script was created to automatically determine valid tile connections and their orientations. Additionally, certain tiles influence other layers: a sand tile with empty space beneath it will trigger the generation of a water tile on a lower layer, while a solid sand tile might prompt the top layer to generate planks. Tiles are also assigned weights, giving finer control over their visual frequency and allowing for more curated and intentional design results.
 
 # Tile set
+All tile assets were hand-designed using custom pixel art created specifically for this system, using Aseprite.
 ![Middle TileSet](Assets/Materials/Mid%20Tiles/landTileMap.png "Middle TileSet")
 ![Bot TileSet](Assets/Materials/Bot%20Tiles/bottomTileMap.png "Bot TileSet")
 ![Top TileSet](Assets/Materials/Top%20Tiles/TopTileMap.png "Top TileSet")
