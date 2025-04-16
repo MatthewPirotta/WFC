@@ -23,11 +23,11 @@ The project includes a simple but effective debug system to help visualize how t
 ![Sample Debug](ImageVideos/debugSystem.png "Sample Debug")
 
 # Generation Demo
-![](ImageVideos/demo.pmp4)
+![Watch the demo]](https://www.youtube.com/watch?v=TCJ5kTIdp04)
 
 # Unit Tests
 Unit tests were written for core components like the nodes and tile data to ensure the system behaves as expected and remains reliable as it evolves.
 
-#Possible Ideas for the future
+# Possible Ideas for the future
 - Use Unity’s DOTS/ECS for parallelism and performance.
 - Add a smoothing step to reduce noise and eliminate small patches.
