@@ -23,7 +23,7 @@ The project includes a simple but effective debug system to help visualize how t
 ![Sample Debug](ImageVideos/debugSystem.png "Sample Debug")
 
 # Generation Demo
-![Watch the demo]](https://www.youtube.com/watch?v=TCJ5kTIdp04)
+[![Watch the demo](https://img.youtube.com/vi/TCJ5kTIdp04/0.jpg)](https://www.youtube.com/watch?v=TCJ5kTIdp04)
 
 # Unit Tests
 Unit tests were written for core components like the nodes and tile data to ensure the system behaves as expected and remains reliable as it evolves.
