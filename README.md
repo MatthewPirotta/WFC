@@ -15,7 +15,7 @@ Each tile in the system has a manually defined rule set that governs which tiles
 ![Bot TileSet](Assets/Materials/Bot%20Tiles/bottomTileMap.png "Bot TileSet")
 ![Top TileSet](Assets/Materials/Top%20Tiles/TopTileMap.png "Top TileSet")
 
-#Sample Generation
+# Sample Generation
 ![Sample Generation](ImageVideos/FinalGeneration.png "Sample Generation")
 
 # Debug system
@@ -23,7 +23,7 @@ The project includes a simple but effective debug system to help visualize how t
 ![Sample Debug](ImageVideos/debugSystem.png "Sample Debug")
 
 # Generation Demo
-![Full Demo](ImageVideos/demo.pmp4 "Full Demo")
+![](ImageVideos/demo.pmp4)
 
 # Unit Tests
 Unit tests were written for core components like the nodes and tile data to ensure the system behaves as expected and remains reliable as it evolves.
