@@ -21,6 +21,8 @@ All tile assets were hand-designed using custom pixel art created specifically f
 
 # Debug system
 The project includes a simple but effective debug system to help visualize how the Wave Function Collapse algorithm operates. For any given layer, it displays the set of possible tiles that can still be placed at each node. These tiles are scaled based on their likelihood of being selected, giving a quick visual cue about the current tile probabilities. Additionally, each node's entropy (representing the value of valid options remaining).
+
+
 ![Sample Debug](ImageVideos/debugSystem.png "Sample Debug")
 
 # Generation Demo
